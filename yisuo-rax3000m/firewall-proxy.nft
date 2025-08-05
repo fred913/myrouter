@@ -76,12 +76,18 @@ table inet myrouter {
         ip6 daddr @direct_list6 counter goto out_wan_balanced;
 
         # is TCP or UDP: try tproxy
-        meta l4proto {tcp, udp} trace;
+        # meta l4proto {tcp, udp} trace;
         # meta l4proto {tcp, udp} meta mark set 1100 accept;
         # only intersect DNS
-        udp dport 53 meta mark set 1100 accept;
-        ip daddr @CHNROUTES goto out_wan_balanced;
-    }
+        # udp dport 53 meta mark set 1100 accept;
+        ip daddr @CHNROUTES counter accept;
+
+        # proxy all other TCP/UDP abroad traffic
+        meta l4proto {tcp, udp} meta mark set 1100 goto out_tproxy;
+
+        # fallback for other traffic
+        counter accept;
+     }
 
     chain prerouting {    
         type filter hook prerouting priority dstnat+5; policy accept;
