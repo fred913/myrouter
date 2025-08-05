@@ -79,7 +79,7 @@ table inet myrouter {
         # meta l4proto {tcp, udp} meta mark set 1100 accept;
         # only intersect DNS
         udp dport 53 meta mark set 1100 accept;
-        meta l4proto {tcp, udp} goto out_wan_balanced;
+        ip daddr @CHNROUTES goto out_wan_balanced;
     }
 
     chain prerouting {    
